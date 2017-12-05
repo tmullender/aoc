@@ -6,10 +6,8 @@ def checksum(file_path):
     with open(file_path, 'r') as reader:
         for line in reader.readlines():
             fields = map(int, line.split())
-            highest = max(fields)
-            lowest = min(fields)
-            difference = highest - lowest
-            total += difference
+            matches = [x/y for x in fields for y in fields if x != y and x % y == 0]
+            total += sum(matches)
     return total
 
 
