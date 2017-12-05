@@ -3,7 +3,7 @@ import sys
 
 def sum_repeated_digits(captcha):
     length = len(captcha)
-    increment = 1
+    increment = length/2
     total = 0
     for i, c in enumerate(captcha):
         idx = (i + increment) % length
