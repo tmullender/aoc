@@ -1,9 +1,13 @@
 import sys
 
 
+def sort_string(word):
+    return "".join(sorted(word))
+
+
 def is_valid(passphrase):
     words = passphrase.split()
-    unique = set(words)
+    unique = set(map(sort_string, words))
     return len(words) == len(unique)
 
 
