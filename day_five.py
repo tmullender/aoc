@@ -8,7 +8,10 @@ def count_instructions(filepath):
         steps = 0
         while 0 <= position < len(instructions):
             instruction = instructions[position]
-            instructions[position] = instruction + 1
+            if instruction > 2:
+                instructions[position] = instruction - 1
+            else:
+                instructions[position] = instruction + 1
             position += int(instruction)
             steps +=1
         return steps
