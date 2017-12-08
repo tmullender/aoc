@@ -83,12 +83,14 @@ func getConditional(conditional string) func(int64, int64) bool {
 	return result
 }
 
-func evaluate(registers *mapWithDefault, expression []string) {
+func evaluate(registers *mapWithDefault, expression []string) int64 {
 	log.Println(expression)
 	register := expression[0]
 	instruction := getInstruction(expression[1])
 	offset, _ := strconv.ParseInt(expression[2], 0, 64)
-	(*registers)[register] = instruction((*registers).get(register), offset)
+	updated := instruction((*registers).get(register), offset)
+	(*registers)[register] = updated
+	return updated
 }
 
 func condition(registers *mapWithDefault, conditions []string) bool {
@@ -108,21 +110,17 @@ func run(file *os.File) {
 	registers := mapWithDefault(map[string]int64{})
 	regex := regexp.MustCompile(pattern)
 	scanner := bufio.NewScanner(file)
+	max := int64(0)
 	for scanner.Scan() {
 		line := scanner.Text()
 		log.Println(line)
 		matches := regex.FindStringSubmatch(line)
 		if condition(&registers, matches[4:]) {
-			evaluate(&registers, matches[1:4])
+			value := evaluate(&registers, matches[1:4])
+			if value > max {
+				max = value
+			}
 		}
 	}
-	max := int64(0)
-	maxKey := ""
-	for key, value := range registers {
-		if value > max {
-			max = value
-			maxKey = key
-		}
-	}
-	fmt.Printf("%s: %d\n", maxKey, max)
+	fmt.Printf("%d\n", max)
 }
