@@ -33,7 +33,6 @@ func run(file *os.File) {
 
 func totalScore(line string) int {
 	score := 0
-	level := 0
 	garbage := false
 	skipping := false
 	for _, c := range line {
@@ -43,19 +42,16 @@ func totalScore(line string) int {
 		}
 		if c == ignore {
 			skipping = true
-		}
-		if c == garbageStart {
-			garbage = true
+			continue
 		}
 		if c == garbageEnd {
 			garbage = false
 		}
-		if !garbage && c == groupStart {
-			level++
+		if garbage {
+			score++
 		}
-		if !garbage && c == groupEnd {
-			score += level
-			level--
+		if c == garbageStart {
+			garbage = true
 		}
 	}
 	return score
