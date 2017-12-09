@@ -105,7 +105,9 @@ func condition(registers *mapWithDefault, conditions []string) bool {
 func runPath(filepath string) {
 	file, _ := os.Open(filepath)
 	run(file)
+	file.Close()
 }
+
 func run(file *os.File) {
 	registers := mapWithDefault(map[string]int64{})
 	regex := regexp.MustCompile(pattern)

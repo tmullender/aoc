@@ -20,6 +20,7 @@ func main() {
 func runPath(filepath string) {
 	file, _ := os.Open(filepath)
 	run(file)
+	file.Close()
 }
 
 func run(file *os.File) {
