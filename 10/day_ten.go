@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"strconv"
-	"strings"
 )
 
 func main() {
@@ -22,29 +21,54 @@ func runPath(length int64, filepath string) {
 
 func run(length int64, file *os.File) {
 	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanLines)
 	for scanner.Scan() {
-		line := scanner.Text()
+		line := scanner.Bytes()
+		line = append(line, 17, 31, 73, 47, 23)
 		log.Println(line)
 		fmt.Println(hash(length, line))
 	}
 }
 
-func hash(size int64, input string) int {
+func list(size int64) []int {
 	list := make([]int, size)
 	for i := range list {
 		list[i] = i
 	}
+	return list
+}
+
+func scramble(list *[]int, size int64, input []byte) {
 	skip := 0
 	position := 0
-	for _, next := range strings.Split(input, ",") {
-		length, _ := strconv.ParseInt(next, 0, 64)
-		for i := 0; i < int(length)/2; i++ {
-			j := (position + i) % int(size)
-			k := (position + int(length) - i - 1) % int(size)
-			list[j], list[k] = list[k], list[j]
+	for l := 0; l < 64; l++ {
+		for _, next := range input {
+			length := int(next)
+			for i := 0; i < length/2; i++ {
+				j := (position + i) % int(size)
+				k := (position + length - i - 1) % int(size)
+				(*list)[j], (*list)[k] = (*list)[k], (*list)[j]
+			}
+			position += length + skip
+			skip++
 		}
-		position += int(length) + skip
-		skip++
 	}
-	return list[0] * list[1]
+}
+
+func createHash(list *[]int) string {
+	hash := ""
+	for i := 0; i < 16; i++ {
+		block := (*list)[16*i]
+		for j := 1; j < 16; j++ {
+			block ^= (*list)[16*i+j]
+		}
+		hash = fmt.Sprintf("%s%02x", hash, block)
+	}
+	return hash
+}
+
+func hash(size int64, input []byte) string {
+	list := list(size)
+	scramble(&list, size, input)
+	return createHash(&list)
 }
