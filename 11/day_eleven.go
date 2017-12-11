@@ -41,10 +41,15 @@ func run(file *os.File) {
 func shortestPath(input string) int {
 	directions := strings.Split(input, ",")
 	counts := mapWithZeroes{}
+	max := 0
 	for _, direction := range directions {
 		counts[direction] = counts.get(direction) + 1
+		steps := countSteps(&counts)
+		if steps > max {
+			max = steps
+		}
 	}
-	return countSteps(&counts)
+	return max
 }
 
 func abs(input int) int {
