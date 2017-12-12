@@ -46,13 +46,19 @@ func run(file *os.File) {
 		connections := strings.Split(connection[1], ", ")
 		programs[connection[0]] = &connections
 	}
-	fmt.Println(countGroup("0", &programs))
+	fmt.Println(countGroups(&programs))
 }
 
-func countGroup(program string, programs *mapOfLists) int {
-	inGroup := set{}
-	group(program, &inGroup, programs)
-	return len(inGroup)
+func countGroups(programs *mapOfLists) int {
+	acc := set{}
+	count := 0
+	for program := range *programs {
+		if _, exists := acc[program]; !exists {
+			group(program, &acc, programs)
+			count++
+		}
+	}
+	return count
 }
 
 func group(program string, acc *set, all *mapOfLists) {
