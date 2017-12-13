@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -55,19 +54,42 @@ func run(file *os.File) {
 		max = int(layer)
 		scanners[int(layer)] = &scanner{0, int(scope), true}
 	}
-	fmt.Println(calculateSeverity(max, &scanners))
+	fmt.Println(timeToGo(max, scanners))
 }
 
-func calculateSeverity(max int, scanners *map[int]*scanner) int {
-	severity := 0
-	for i := 0; i <= max; i++ {
-		if scannr, exists := (*scanners)[i]; exists && (*scannr).position == 0 {
-			log.Printf("Scanner found at layer %d: %v\n", i, *scannr)
-			severity += i * (*scannr).scope
+func timeToGo(layers int, scanners map[int]*scanner) int {
+	delay := 0
+	for true {
+		if isClear(layers, copy(scanners)) {
+			return delay
 		}
-		for _, scannr := range *scanners {
-			(*scannr).move()
-		}
+		moveAll(scanners)
+		delay++
 	}
-	return severity
+	return -1
+}
+
+func copy(scanners map[int]*scanner) map[int]*scanner {
+	result := map[int]*scanner{}
+	for k, v := range scanners {
+		w := *v
+		result[k] = &w
+	}
+	return result
+}
+
+func isClear(layers int, scanners map[int]*scanner) bool {
+	for i := 0; i <= layers; i++ {
+		if scannr, exists := scanners[i]; exists && (*scannr).position == 0 {
+			return false
+		}
+		moveAll(scanners)
+	}
+	return true
+}
+
+func moveAll(scanners map[int]*scanner) {
+	for _, scannr := range scanners {
+		(*scannr).move()
+	}
 }
