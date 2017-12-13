@@ -38,7 +38,7 @@ func list(size int64) []int {
 	return list
 }
 
-func scramble(list *[]int, size int64, input []byte) {
+func scramble(list []int, size int64, input []byte) {
 	skip := 0
 	position := 0
 	for l := 0; l < 64; l++ {
@@ -47,7 +47,7 @@ func scramble(list *[]int, size int64, input []byte) {
 			for i := 0; i < length/2; i++ {
 				j := (position + i) % int(size)
 				k := (position + length - i - 1) % int(size)
-				(*list)[j], (*list)[k] = (*list)[k], (*list)[j]
+				list[j], list[k] = list[k], list[j]
 			}
 			position += length + skip
 			skip++
@@ -55,12 +55,12 @@ func scramble(list *[]int, size int64, input []byte) {
 	}
 }
 
-func createHash(list *[]int) string {
+func createHash(list []int) string {
 	hash := ""
 	for i := 0; i < 16; i++ {
-		block := (*list)[16*i]
+		block := list[16*i]
 		for j := 1; j < 16; j++ {
-			block ^= (*list)[16*i+j]
+			block ^= list[16*i+j]
 		}
 		hash = fmt.Sprintf("%s%02x", hash, block)
 	}
@@ -69,6 +69,6 @@ func createHash(list *[]int) string {
 
 func hash(size int64, input []byte) string {
 	list := list(size)
-	scramble(&list, size, input)
-	return createHash(&list)
+	scramble(list, size, input)
+	return createHash(list)
 }

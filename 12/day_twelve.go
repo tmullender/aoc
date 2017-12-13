@@ -8,22 +8,22 @@ import (
 	"strings"
 )
 
-type mapOfLists map[string]*[]string
+type mapOfLists map[string][]string
 
 type set map[string]bool
 
-func (s *set) add(i string) {
-	(*s)[i] = true
+func (s set) add(i string) {
+	s[i] = true
 }
 
-func (s *set) intersect(o *[]string) *[]string {
+func (s set) intersect(o []string) []string {
 	i := []string{}
-	for _, v := range *o {
-		if _, exists := (*s)[v]; !exists {
+	for _, v := range o {
+		if _, exists := s[v]; !exists {
 			i = append(i, v)
 		}
 	}
-	return &i
+	return i
 }
 
 func main() {
@@ -44,26 +44,26 @@ func run(file *os.File) {
 		log.Println(line)
 		connection := strings.Split(line, " <-> ")
 		connections := strings.Split(connection[1], ", ")
-		programs[connection[0]] = &connections
+		programs[connection[0]] = connections
 	}
-	fmt.Println(countGroups(&programs))
+	fmt.Println(countGroups(programs))
 }
 
-func countGroups(programs *mapOfLists) int {
+func countGroups(programs mapOfLists) int {
 	acc := set{}
 	count := 0
-	for program := range *programs {
+	for program := range programs {
 		if _, exists := acc[program]; !exists {
-			group(program, &acc, programs)
+			group(program, acc, programs)
 			count++
 		}
 	}
 	return count
 }
 
-func group(program string, acc *set, all *mapOfLists) {
+func group(program string, acc set, all mapOfLists) {
 	acc.add(program)
-	for _, i := range *acc.intersect((*all)[program]) {
+	for _, i := range acc.intersect(all[program]) {
 		group(i, acc, all)
 	}
 }

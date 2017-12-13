@@ -11,8 +11,8 @@ import (
 
 type mapWithZeroes map[string]int
 
-func (m *mapWithZeroes) get(key string) int {
-	if value, exists := (*m)[key]; exists {
+func (m mapWithZeroes) get(key string) int {
+	if value, exists := m[key]; exists {
 		return value
 	}
 	return 0
@@ -44,7 +44,7 @@ func shortestPath(input string) int {
 	max := 0
 	for _, direction := range directions {
 		counts[direction] = counts.get(direction) + 1
-		steps := countSteps(&counts)
+		steps := countSteps(counts)
 		if steps > max {
 			max = steps
 		}
@@ -66,7 +66,7 @@ func min(a int, b int) int {
 	return a
 }
 
-func countSteps(counts *mapWithZeroes) int {
+func countSteps(counts mapWithZeroes) int {
 	n := counts.get("n") - counts.get("s")
 	ne := counts.get("ne") - counts.get("sw")
 	nw := counts.get("nw") - counts.get("se")
