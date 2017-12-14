@@ -102,13 +102,13 @@ func condition(registers mapWithDefault, conditions []string) bool {
 	return conditional(a, b)
 }
 
-func runPath(filepath string) {
+func runPath(filepath string) []string {
 	file, _ := os.Open(filepath)
-	run(file)
-	file.Close()
+	defer file.Close()
+	return run(file)
 }
 
-func run(file *os.File) {
+func run(file *os.File) (result []string) {
 	registers := mapWithDefault(map[string]int64{})
 	regex := regexp.MustCompile(pattern)
 	scanner := bufio.NewScanner(file)
@@ -124,5 +124,6 @@ func run(file *os.File) {
 			}
 		}
 	}
-	fmt.Printf("%d\n", max)
+	result = append(result, fmt.Sprintf("%d", max))
+	return
 }
