@@ -7,7 +7,8 @@ import (
 
 func TestExample(t *testing.T) {
 	result := runPath("day_fourteen.example")
-	if result[0] != "8108" {
+	fmt.Println(result)
+	if result[0] != "1242" {
 		t.Fail()
 	}
 }
@@ -15,7 +16,7 @@ func TestExample(t *testing.T) {
 func TestInput(t *testing.T) {
 	result := runPath("day_fourteen.input")
 	fmt.Println(result)
-	if result[0] != "8230" {
+	if result[0] != "1103" {
 		t.Fail()
 	}
 }

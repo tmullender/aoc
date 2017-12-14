@@ -4,11 +4,54 @@ import (
 	"bufio"
 	"fmt"
 	"log"
-	"math/bits"
 	"os"
 	"strconv"
 	"strings"
 )
+
+type coordinate struct {
+	x int
+	y int
+}
+
+func (c *coordinate) left() *coordinate {
+	return &coordinate{c.x - 1, c.y}
+}
+
+func (c *coordinate) right() *coordinate {
+	return &coordinate{c.x + 1, c.y}
+}
+
+func (c *coordinate) up() *coordinate {
+	return &coordinate{c.x, c.y - 1}
+}
+
+func (c *coordinate) down() *coordinate {
+	return &coordinate{c.x, c.y + 1}
+}
+
+type accumulator struct {
+	history map[coordinate]bool
+	regions [][]coordinate
+	current []coordinate
+}
+
+func (a *accumulator) visited(c coordinate) bool {
+	_, exists := a.history[c]
+	return exists
+}
+
+func (a *accumulator) add(c coordinate) {
+	a.history[c] = true
+	a.current = append(a.current, c)
+}
+
+func (a *accumulator) next() {
+	if len(a.current) > 0 {
+		a.regions = append(a.regions, a.current)
+		a.current = []coordinate{}
+	}
+}
 
 func main() {
 	run(os.Stdin)
@@ -25,30 +68,55 @@ func run(file *os.File) (result []string) {
 	for reader.Scan() {
 		line := reader.Bytes()
 		log.Println(line)
-		count := count(line)
-		result = append(result, fmt.Sprintf("%d", count))
+		grid := createGrid(line)
+		result = append(result, fmt.Sprintf("%d", countRegions(grid)))
 	}
 	return
 }
 
-func count(input []byte) int {
-	count := 0
+func countRegions(grid []string) int {
+	history := accumulator{map[coordinate]bool{}, [][]coordinate{}, []coordinate{}}
+	for i := 0; i < len(grid); i++ {
+		for j := 0; j < len(grid[i]); j++ {
+			findRegion(&history, grid, &coordinate{i, j})
+			history.next()
+		}
+	}
+	return len(history.regions)
+}
+
+func findRegion(history *accumulator, grid []string, point *coordinate) bool {
+	if point.x < 0 || point.x >= len(grid) || point.y < 0 || point.y >= len(grid[point.x]) {
+		return false
+	}
+	if grid[point.x][point.y] == 48 {
+		return false
+	}
+	if history.visited(*point) {
+		return false
+	}
+	history.add(*point)
+	return findRegion(history, grid, point.left()) || findRegion(history, grid, point.right()) || findRegion(history, grid, point.up()) || findRegion(history, grid, point.down())
+}
+
+func createGrid(input []byte) []string {
+	grid := []string{}
 	for i := 0; i < 128; i++ {
 		rowInput := append(input, []byte(fmt.Sprintf("-%d", i))...)
 		rowInput = append(rowInput, 17, 31, 73, 47, 23)
 		hash := hash(256, rowInput)
-		count += countBits(hash)
+		grid = append(grid, createRow(hash))
 	}
-	return count
+	return grid
 }
 
-func countBits(input string) int {
-	count := 0
+func createRow(input string) string {
+	row := ""
 	for _, x := range strings.Split(input, "") {
-		digit, _ := strconv.ParseUint(x, 16, 32)
-		count += bits.OnesCount64(digit)
+		digit, _ := strconv.ParseInt(x, 16, 32)
+		row += fmt.Sprintf("%04b", digit)
 	}
-	return count
+	return row
 }
 
 func list(size int64) []int {
@@ -77,15 +145,15 @@ func scramble(list []int, size int64, input []byte) {
 }
 
 func createHash(list []int) string {
-	hashString := ""
+	hash := ""
 	for i := 0; i < 16; i++ {
 		block := list[16*i]
 		for j := 1; j < 16; j++ {
 			block ^= list[16*i+j]
 		}
-		hashString = fmt.Sprintf("%s%02x", hashString, block)
+		hash = fmt.Sprintf("%s%02x", hash, block)
 	}
-	return hashString
+	return hash
 }
 
 func hash(size int64, input []byte) string {
