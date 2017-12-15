@@ -1,7 +1,7 @@
 {
-  "name": "15",
+  "name": "01",
   "version": "1.0.0",
-  "description": "Day 15",
+  "description": "Day 01",
   "repository": "http://github.com/tmullender/aoc",
   "main": "index.js",
   "scripts": {
