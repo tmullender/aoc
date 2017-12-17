@@ -1,12 +1,13 @@
 var exports = module.exports = {};
 
 exports.spinlock = function (step) {
-  var buffer = [0]
   var position = 0
-  for (i=1; i <= 2017; i++) {
-    position = ((position + step) % buffer.length) + 1
-    buffer.splice(position, 0, i)
-    // console.log(buffer.join(","))
+  var result = 0
+  for (i=1; i <= 50000000; i++) {
+    position = ((position + step) % i) + 1
+    if (position == 1) {
+      result = i
+    }
   }
-  return buffer[position +1]
+  return result
 }
