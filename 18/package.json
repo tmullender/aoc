@@ -1,0 +1,15 @@
+{
+  "name": "18",
+  "version": "1.0.0",
+  "description": "Day 18",
+  "repository": "http://github.com/tmullender/aoc",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "mocha": "^4.0.1"
+  }
+}
