@@ -37,14 +37,12 @@ exports.play = function (content) {
   }
   var move = down
   var directions = [down, left, up, right]
-  var result = ""
+  var count = 0
   var value = map[x][y]
   while (true) {
-    while (value != '+' && inbounds(x, y)) {
-      if (letters.indexOf(value) >= 0) {
-        result += value
-      }
+    while (value != '+' && value != ' ' && inbounds(x, y)) {
       move()
+      count += 1
       value = map[x][y]
     }
     if (inbounds(x+1, y) && map[x+1][y] != ' ' && move != up) {
@@ -56,9 +54,10 @@ exports.play = function (content) {
     } else if (inbounds(x-1, y) && map[x-1][y] != ' ' && move != down) {
       move = up
     } else {
-      return result
+      return count
     }
     move()
+    count += 1
     value = map[x][y]
   }
   return "X"

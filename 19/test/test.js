@@ -6,7 +6,7 @@ describe('Examples', function() {
   describe('Maze', function() {
     it('should return ABCDEF', function(done) {
       fs.readFile('day_nineteen.example', {encoding :'utf8' }, (_, content) => {
-        assert.equal(main.play(content), "ABCDEF");
+        assert.equal(main.play(content), 38);
         done();
       });
     });
@@ -17,7 +17,7 @@ describe('Input', function() {
   describe('Maze', function() {
     it('should return ?', function(done) {
       fs.readFile('day_nineteen.input', {encoding :'utf8' }, (_, content) => {
-        assert.equal(main.play(content), "HATBMQJYZ");
+        assert.equal(main.play(content), 16332);
         done();
       });
     });
