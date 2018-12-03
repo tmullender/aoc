@@ -1,8 +1,13 @@
 #! /bin/env python
 
 if __name__ == "__main__":
-    with open("input.txt", 'r') as reader:
-        total = 0
-        for line in reader.readlines():
-            total += int(line)
-        print total
+    freqs = set()
+    freq = 0
+    while True:
+        with open("input.txt", 'r') as reader:
+            for line in reader.readlines():
+                freq += int(line)
+                if freq in freqs:
+                    print freq
+                    exit(0)
+                freqs.add(freq)
