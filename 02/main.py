@@ -1,28 +1,20 @@
 #! /bin/env python
 
-def count_letters(line):
-    a = 0
-    b = 0
-    counts = dict()
-    for x in line:
-        if x in counts:
-            counts[x] += 1
-        else:
-            counts[x] = 1
-    for count in counts.values():
-        if count == 2:
-            a = 1
-        elif count == 3:
-            b = 1
-    return a, b
-
 if __name__ == "__main__":
     with open("input.txt", 'r') as reader:
-        twos = 0
-        threes = 0
-        for line in reader.readlines():
-            a, b = count_letters(line)
-            twos += a
-            threes += b
-        print twos * threes
-        
+        lines = reader.readlines()
+        for line in range (0, len(lines)):
+            for next in range(line+1, len(lines)):
+                differences = 0
+                currentLine = lines[line]
+                nextLine = lines[next]
+                if len(currentLine) == len(nextLine):
+                    for i in range(0, len(currentLine)):
+                        if currentLine[i] != nextLine[i]:
+                            differences +=1
+                        if differences > 1:
+                            break
+                    if differences == 1:
+                        print currentLine
+                        print nextLine
+                        exit(0)
