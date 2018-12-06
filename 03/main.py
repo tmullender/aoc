@@ -24,17 +24,20 @@ class Claim:
 
 if __name__ == "__main__":
     with open("input.txt", 'r') as reader:
-        used = set()
-        duplicated = set()
+        used = dict()
+        unique_claims = set()
         for line in reader.readlines():
             claim = Claim(line)
-            keys = claim.get_keys()
-            for key in keys:
+            unique_claims.add(claim.id)
+            for key in claim.get_keys():
                 if key in used:
-                    duplicated.add(key)
+                    used[key].append(claim.id)
+                    for id in used[key]:
+                        if id in unique_claims:
+                            unique_claims.remove(id)
                 else:
-                    used.add(key)
-        print len(duplicated)
+                    used[key] = [claim.id]
+        print unique_claims
 
 
 
