@@ -11,6 +11,7 @@ class Guard:
         self.start_time = None
         self.duration = 0
         self.minutes = dict()
+        self.busiest = [0, 0]
 
     def start(self, time):
         self.start_time = time
@@ -23,18 +24,14 @@ class Guard:
                 self.minutes[minute] += 1
             else:
                 self.minutes[minute] = 1
+            if self.minutes[minute] > self.busiest[1]:
+                self.busiest = [minute, self.minutes[minute]]
 
     def total(self):
-        return self.duration
+        return self.busiest[1]
 
-    def busiest(self):
-        count = 0
-        minute = None
-        for k in self.minutes:
-            if self.minutes[k] > count:
-                minute = k
-                count = self.minutes[k]
-        return minute
+    def minute(self):
+        return self.busiest[0]
 
 
 if __name__ == "__main__":
@@ -57,4 +54,4 @@ if __name__ == "__main__":
                 guards[updateType] = current
             if sleepiest is None or current.total() > sleepiest.total():
                 sleepiest = current
-        print sleepiest.guardId, sleepiest.busiest()
+        print sleepiest.guardId, sleepiest.minute()
