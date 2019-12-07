@@ -34,5 +34,5 @@ compileTestKotlin.kotlinOptions {
 }
 
 application {
-    mainClassName = "com.adventofcode.nineteen.FiveKt"
+    mainClassName = "com.adventofcode.nineteen.SixKt"
 }
