@@ -8,7 +8,7 @@ fun main(args: Array<String>) {
         return
     }
     val input = File(args[0]).readLines()
-    val coordinates = Array(2){ i -> mutableMapOf("0,0" to -1)}
+    val coordinates = Array(2){ _ -> mutableMapOf("0,0" to -1)}
     for (line in input.indices) {
         var x = 0
         var y = 0
