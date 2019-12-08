@@ -1,26 +1,16 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-        
-    dependencies {
-        classpath(kotlin("gradle-plugin", version = "1.3.61"))
-    }
-}
-
 plugins {
     kotlin("jvm") version "1.3.61"
     application
 }
 
-dependencies {
-    implementation(kotlin("stdlib-jdk8"))
-}
-
 repositories {
     mavenCentral()
+}
+
+dependencies {
+    implementation(kotlin("stdlib-jdk8"))
 }
 
 val compileKotlin: KotlinCompile by tasks
@@ -34,5 +24,5 @@ compileTestKotlin.kotlinOptions {
 }
 
 application {
-    mainClassName = "com.adventofcode.nineteen.SixKt"
+    mainClassName = "com.adventofcode.nineteen.EightKt"
 }
