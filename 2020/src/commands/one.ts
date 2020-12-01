@@ -6,7 +6,7 @@ export default class One extends Command {
 
   static examples = [
     `$ aoc-2020 one resources/test-one-a.txt
-515479
+241861950
 `,
   ]
 
@@ -17,20 +17,20 @@ export default class One extends Command {
   async run() {
     const {args} = this.parse(One)
     const target = 2020
-    const midPoint = 1010
+    const cutoff = 680
 
-    if (args.input) {
-      const content = readFileSync(args.input, {encoding: 'UTF8'})
-      const input = content.split('\n').filter(x => x).map(x => parseInt(x, 10)).sort((a, b) => a - b)
-      for (let i = 0; i < input.length && input[i] <= midPoint; i++) {
-        for (let j = input.length - 1; input[j] >= midPoint && j > 0; j--) {
-          if (input[j] + input[i] === target) {
-            this.log(`${input[i] * input[j]}`)
+    const content = readFileSync(args.input, {encoding: 'UTF8'})
+    const input = content.split('\n').filter(x => x).map(x => parseInt(x, 10)).sort((a, b) => a - b)
+    for (let i = 0; i < input.length && input[i] < cutoff; i++) {
+      for (let j = input.length - 1; input[j] >= input[i] && j > 0; j--) {
+        for (let k = i + 1; k < j; k++) {
+          if (input[k] + input[j] + input[i] === target) {
+            this.log(`${input[i] * input[j] * input[k]}`)
             return
           }
         }
       }
-      this.log(`you input: ${input}`)
     }
+    this.log(`you input: ${input}`)
   }
 }
