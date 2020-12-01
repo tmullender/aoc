@@ -22,11 +22,11 @@ fun main(args: Array<String>) {
     val san = paths["SAN"]
     val you = paths["YOU"]
     while (you?.get(0)?.equals(san?.get(0))!!){
-        you?.removeAt(0)
+        you.removeAt(0)
         san?.removeAt(0)
     }
     println("Count: $count")
-    println("Path: ${san?.size?.plus(you?.size)}")
+    println("Path: ${san?.size?.plus(you.size)}")
 }
 
 fun buildPaths(obj: String, orbits: MutableMap<String, MutableSet<String>>, paths: MutableMap<String, MutableList<String>>) {
