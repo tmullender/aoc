@@ -5,12 +5,24 @@ function parseLine(line: string): boolean[] {
   return [...line].map(x => x === '#')
 }
 
+function countTrees(map: boolean[][], right: number, down: number): number {
+  let count = 0
+  let x = 0
+  for (let y = 0; y < map.length; y += down) {
+    if (map[y][x]) {
+      count++
+    }
+    x = (x + right) % map[y].length
+  }
+  return count
+}
+
 export default class Three extends Command {
   static description = 'A solver for Day Three'
 
   static examples = [
     `$ aoc-2020 three resources/test-three-a.txt
-7
+336
 `,
   ]
 
@@ -23,14 +35,8 @@ export default class Three extends Command {
 
     const content = readFileSync(args.input, {encoding: 'UTF8'})
     const map = content.split('\n').filter(x => x).map(parseLine)
-    let count = 0
-    let x = 0
-    for (let y = 0; y < map.length; y++) {
-      if (map[y][x]) {
-        count++
-      }
-      x = (x + 3) % map[y].length
-    }
-    this.log(`${count}`)
+    const slopes = [[1, 1], [3, 1], [5, 1], [7, 1], [1, 2]]
+    const total = slopes.reduce((acc, current) => acc * countTrees(map, current[0], current[1]), 1)
+    this.log(`${total}`)
   }
 }
