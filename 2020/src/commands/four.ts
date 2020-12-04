@@ -1,7 +1,24 @@
 import {Command} from '@oclif/command'
 import {readFileSync} from 'fs'
 
-const required_keys = ['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid']
+function hairColourValidation(x: string): boolean {
+  const type = x.substring(x.length - 2)
+  const value = parseInt(x.substring(0, x.length - 2), 10)
+  if (type === 'in') {
+    return value >= 59 && value <= 76
+  }
+  return value >= 150 && value <= 193
+}
+
+const required_keys: { [key: string]: (x: string) => boolean } = {
+  byr: x => parseInt(x, 10) >= 1920 && parseInt(x, 10) <= 2002,
+  iyr: x => parseInt(x, 10) >= 2010 && parseInt(x, 10) <= 2020,
+  eyr: x => parseInt(x, 10) >= 2020 && parseInt(x, 10) <= 2030,
+  hgt: hairColourValidation,
+  hcl: x => /^#[0-9a-f]{6}$/.test(x),
+  ecl: x => ['amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth'].includes(x),
+  pid: x => /^\d{9}$/.test(x),
+}
 
 function parseLine(line: string): Map<string, string> {
   return line.trim().split(' ').reduce((acc, x) => {
@@ -15,8 +32,11 @@ function parseLine(line: string): Map<string, string> {
 }
 
 function isValid(passport: Map<string, string>): number {
-  for (let i = 0; i < required_keys.length; i++) {
-    if (!passport.has(required_keys[i])) {
+  const fields = Object.keys(required_keys)
+  for (let i = 0; i < fields.length; i++) {
+    const field = fields[i]
+    const value = passport.get(field)
+    if (!value || !required_keys[field](value)) {
       return 0
     }
   }
@@ -28,7 +48,7 @@ export default class Four extends Command {
 
   static examples = [
     `$ aoc-2020 four resources/test-four-a.txt
-2
+4
 `,
   ]
 
