@@ -31,6 +31,5 @@ export default class One extends Command {
         }
       }
     }
-    this.log(`you input: ${input}`)
   }
 }
