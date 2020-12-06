@@ -6,7 +6,7 @@ export default class Six extends Command {
 
   static examples = [
     `$ aoc-2020 six resources/test-six-a.txt
-11
+6
 `,
   ]
 
@@ -19,15 +19,18 @@ export default class Six extends Command {
 
     const content = readFileSync(args.input, {encoding: 'UTF8'}).split('\n')
     let count = 0
-    const currentSet = new Set()
-    content.forEach(line => {
+    let currentSet = new Set([...content[0]])
+    for (let i = 0; i < content.length; i++) {
+      const line = content[i]
       if (line) {
-        [...line].forEach(currentSet.add, currentSet)
+        currentSet = new Set([...line].filter(x => currentSet.has(x)))
       } else {
         count += currentSet.size
-        currentSet.clear()
+        if (i < content.length - 1) {
+          currentSet = new Set([...content[i + 1]])
+        }
       }
-    })
+    }
     this.log(`${count}`)
   }
 }
