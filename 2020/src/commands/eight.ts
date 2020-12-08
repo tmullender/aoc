@@ -11,6 +11,20 @@ class Instruction {
     this.command = split[0]
     this.value = parseInt(split[1], 10)
   }
+
+  swap() {
+    switch (this.command) {
+    case 'acc':
+      return false
+    case 'jmp':
+      this.command = 'nop'
+      break
+    case 'nop':
+      this.command = 'jmp'
+      break
+    }
+    return true
+  }
 }
 
 function run(instructions: Array<Instruction>) {
@@ -41,7 +55,7 @@ export default class Eight extends Command {
 
   static examples = [
     `$ aoc-2020 eight resources/test-eight-a.txt
-5
+8
 `,
   ]
 
@@ -54,7 +68,19 @@ export default class Eight extends Command {
 
     const content = readFileSync(args.input, {encoding: 'UTF8'}).split('\n').filter(x => x)
     const instructions = content.map(x => new Instruction(x))
-    const result = run(instructions)
+    let result = [0, 0]
+    for (let i = 0; i < instructions.length; i++) {
+      const instruction = instructions[i]
+      if (instruction.swap()) {
+        result = run(instructions)
+        instruction.swap()
+        // console.log(i)
+        // console.log(result[0])
+        if (result[0] === instructions.length) {
+          break
+        }
+      }
+    }
     this.log(`${result[1]}`)
   }
 }

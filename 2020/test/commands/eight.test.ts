@@ -5,6 +5,6 @@ describe('eight', () => {
   .stdout()
   .command(['eight', 'resources/test-eight-a.txt'])
   .it('runs eight a', ctx => {
-    expect(ctx.stdout.trim()).to.equal('5')
+    expect(ctx.stdout.trim()).to.equal('8')
   })
 })
