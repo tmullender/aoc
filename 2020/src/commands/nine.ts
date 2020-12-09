@@ -1,18 +1,17 @@
 import {Command, flags} from '@oclif/command'
 import {readFileSync} from 'fs'
-import {combination} from 'js-combinatorics'
 
 export default class Nine extends Command {
   static description = 'A solver for Day Nine'
 
   static examples = [
     `$ aoc-2020 nine resources/test-nine-a.txt
-127
+62
 `,
   ]
 
   static flags = {
-    size: flags.integer({char: 's', default: 5}),
+    total: flags.integer({char: 't', default: 127}),
   }
 
   static args = [{name: 'input', required: true}]
@@ -20,13 +19,24 @@ export default class Nine extends Command {
   async run() {
     const {args} = this.parse(Nine)
     const {flags} = this.parse(Nine)
-    const preamble = flags.size
 
     const content = readFileSync(args.input, {encoding: 'UTF8'}).split('\n').filter(x => x).map(x => parseInt(x, 10))
-    for (let i = preamble; i < content.length; i++) {
-      const valid = combination(content.slice(i - preamble, i), 2).map(x => x[0] + x[1])
-      if (!new Set(valid).has(content[i])) {
-        this.log(`${content[i]}`)
+    let i = 0
+    let j = 0
+    let total = content[0]
+    while (i < content.length && j < content.length) {
+      if (total < flags.total) {
+        j++
+        total += content[j]
+      }
+      if (total > flags.total) {
+        total -= content[i]
+        i++
+      }
+      if (total === flags.total) {
+        const range = content.slice(i, j + 1)
+        const weakness = Math.max(...range) + Math.min(...range)
+        this.log(`${weakness}`)
         break
       }
     }
