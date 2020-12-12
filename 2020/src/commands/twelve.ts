@@ -11,41 +11,38 @@ class Instruction {
     this.value = parseInt(input.substring(1), 10)
   }
 
-  apply(position: number[]) {
+  rotate(waypoint: number[], angle: number) {
+    for (let i = 0; i < ((angle + 360) % 360) / 90; i++) {
+      const initial = waypoint[0]
+      waypoint[0] = -waypoint[1]
+      waypoint[1] = initial
+    }
+  }
+
+  apply(position: number[], waypoint: number[]) {
     switch (this.type) {
     case 'N':
-      position[1] += this.value
+      waypoint[0] += this.value
       break
     case 'E':
-      position[2] += this.value
+      waypoint[1] += this.value
       break
     case 'S':
-      position[1] -= this.value
+      waypoint[0] -= this.value
       break
     case 'W':
-      position[2] -= this.value
+      waypoint[1] -= this.value
       break
     case 'R':
-      position[0] = (position[0] + this.value) % 360
+      this.rotate(waypoint, this.value)
       break
     case 'L':
-      position[0] = (position[0] - this.value + 360) % 360
+      this.rotate(waypoint, -this.value)
       break
     case 'F':
-      switch (position[0]) {
-      case 0:
-        position[1] += this.value
-        break
-      case 90:
-        position[2] += this.value
-        break
-      case 180:
-        position[1] -= this.value
-        break
-      case 270:
-        position[2] -= this.value
-        break
-      }
+      position[0] += this.value * waypoint[0]
+      position[1] += this.value * waypoint[1]
+      break
     }
   }
 }
@@ -55,7 +52,7 @@ export default class Twelve extends Command {
 
   static examples = [
     `$ aoc-2020 twelve resources/test-twelve-a.txt
-25
+286
 `,
   ]
 
@@ -67,9 +64,10 @@ export default class Twelve extends Command {
     const {args} = this.parse(Twelve)
 
     const content = readFileSync(args.input, {encoding: 'UTF8'}).split('\n')
-    const position = [90, 0, 0]
-    content.map(x => new Instruction(x).apply(position))
-    const distance = Math.abs(position[1]) + Math.abs(position[2])
+    const position = [0, 0]
+    const waypoint = [1, 10]
+    content.map(x => new Instruction(x).apply(position, waypoint))
+    const distance = Math.abs(position[0]) + Math.abs(position[1])
     this.log(`${distance}`)
   }
 }
