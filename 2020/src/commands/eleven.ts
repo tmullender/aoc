@@ -1,15 +1,37 @@
 import {Command} from '@oclif/command'
 import {readFileSync} from 'fs'
 
+function findSeat(last: string[][], i: number, j: number, offset: [number, number]) {
+  while (i >= 0 && i < last.length && j >= 0 && j < last[i].length) {
+    if (last[i][j] === 'L') {
+      return 0
+    }
+    if (last[i][j] === '#') {
+      return 1
+    }
+    i += offset[0]
+    j += offset[1]
+  }
+  return 0
+}
+
 function countOccupied(last: string[][], i: number, j: number) {
-  const adjacent = [last[i][j - 1], last[i][j + 1]]
-  if (i > 0) {
-    adjacent.push(last[i - 1][j - 1], last[i - 1][j], last[i - 1][j + 1])
+  return findSeat(last, i - 1, j - 1, [-1, -1]) +
+    findSeat(last, i - 1, j, [-1, 0]) +
+    findSeat(last, i - 1, j + 1, [-1, 1]) +
+    findSeat(last, i, j - 1, [0, -1]) +
+    findSeat(last, i, j + 1, [0, 1]) +
+    findSeat(last, i + 1, j - 1, [1, -1]) +
+    findSeat(last, i + 1, j, [1, 0]) +
+    findSeat(last, i + 1, j + 1, [1, 1])
+}
+
+function updateSeat(current: string[][], i: number, j: number, occupied: number) {
+  if (current[i][j] === '#' && occupied >= 5) {
+    current[i][j] = 'L'
+  } else if (current[i][j] === 'L' && occupied === 0) {
+    current[i][j] = '#'
   }
-  if (i < last.length - 1) {
-    adjacent.push(last[i + 1][j - 1], last[i + 1][j], last[i + 1][j + 1])
-  }
-  return adjacent.filter(x => x === '#').length
 }
 
 export default class Eleven extends Command {
@@ -17,7 +39,7 @@ export default class Eleven extends Command {
 
   static examples = [
     `$ aoc-2020 eleven resources/test-eleven-a.txt
-37
+26
 `,
   ]
 
@@ -35,11 +57,9 @@ export default class Eleven extends Command {
       last = current.map(x => [...x])
       for (let i = 0; i < current.length; i++) {
         for (let j = 0; j < current[i].length; j++) {
-          const occupied = countOccupied(last, i, j)
-          if (current[i][j] === '#' && occupied >= 4) {
-            current[i][j] = 'L'
-          } else if (current[i][j] === 'L' && occupied === 0) {
-            current[i][j] = '#'
+          if (last[i][j] !== '.') {
+            const occupied = countOccupied(last, i, j)
+            updateSeat(current, i, j, occupied)
           }
         }
       }
