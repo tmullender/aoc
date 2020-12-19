@@ -1,36 +1,42 @@
 import {Command} from '@oclif/command'
 import {readFileSync} from 'fs'
+import {Big} from 'big.js'
 
 class Instruction {
-  indexes: Array<number> = []
+  index = -1
 
-  values: Array<number> = []
+  mask: Array<string> = []
+
+  value = -1
 
   constructor(input: string) {
     if (input.startsWith('mask')) {
-      [...input.slice(7)].forEach((x, i) => {
-        if (x !== 'X') {
-          this.indexes.push(i)
-          this.values.push(parseInt(x, 10))
-        }
-      })
+      this.mask = [...input.slice(7)]
     } else {
       const match = /mem\[(\d+)] = (\d+)/.exec(input)?.slice(1, 3)
       if (match) {
-        this.indexes.push(parseInt(match[0], 10))
-        this.values.push(parseInt(match[1], 10))
+        this.index = parseInt(match[0], 10)
+        this.value = parseInt(match[1], 10)
       }
     }
   }
 
   isMask() {
-    return this.indexes.length > 1
+    return this.index === -1
   }
 
-  apply(value: Array<string>) {
-    for (let i = 0; i < this.indexes.length; i++) {
-      value[this.indexes[i]] = String(this.values[i])
+  apply(address: Array<string>): Array<number> {
+    let addresses: Array<number> = [0]
+    for (let i = 0; i < this.mask.length; i++) {
+      const index = address.length - i
+      const value = 2 ** (i - 1)
+      if (this.mask[index] === 'X') {
+        addresses = addresses.concat(addresses.map(x => x + value))
+      } else if (this.mask[index] === '1' || address[index] === '1') {
+        addresses = addresses.map(x => x + value)
+      }
     }
+    return addresses
   }
 }
 
@@ -39,7 +45,7 @@ export default class Fourteen extends Command {
 
   static examples = [
     `$ aoc-2020 fourteen resources/test-fourteen-a.txt
-165
+208
 `,
   ]
 
@@ -55,16 +61,19 @@ export default class Fourteen extends Command {
     instructions.forEach(x => {
       if (x.isMask()) {
         mask = x
+        // console.log('Mask', mask.mask)
       } else {
-        const binary = (x.values[0] >>> 0).toString(2)
-        const value = [...binary.padStart(36, '0')]
-        mask.apply(value)
-        memory.set(x.indexes[0], parseInt(value.join(''), 2))
+        const binary = (x.index >>> 0).toString(2)
+        const address = [...binary.padStart(mask.mask.length, '0')]
+        // console.log('Address', address)
+        mask.apply(address).forEach(a => {
+          memory.set(a, x.value)
+        })
       }
     })
-    let total = 0
+    let total = new Big(0)
     memory.forEach(v => {
-      total += v
+      total = total.add(v)
     })
     this.log(`${total}`)
   }
