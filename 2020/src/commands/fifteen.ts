@@ -1,4 +1,4 @@
-import {Command} from '@oclif/command'
+import {Command, flags} from '@oclif/command'
 import {readFileSync} from 'fs'
 
 export default class Fifteen extends Command {
@@ -10,23 +10,28 @@ export default class Fifteen extends Command {
 `,
   ]
 
-  static flags = {}
+  static flags = {
+    index: flags.integer({char: 'i', default: 2020}),
+  }
 
   static args = [{name: 'input', required: true}]
 
   async run() {
-    const {args} = this.parse(Fifteen)
+    const {args, flags} = this.parse(Fifteen)
 
-    const content = readFileSync(args.input, {encoding: 'UTF8'}).split(',').map(x => parseInt(x, 10))
-    while (content.length < 2020) {
-      const last = content[content.length - 1]
-      const index = content.lastIndexOf(last, content.length - 2)
-      if (index < 0) {
-        content.push(0)
+    const content = readFileSync(args.input, {encoding: 'UTF8'}).split(',').reduce((acc, x, i) => acc.set(parseInt(x, 10), i), new Map())
+    let index = content.size // Assumes initial values are unique
+    let value = 0
+    while (index < flags.index - 1) {
+      const last = content.get(value)
+      content.set(value, index)
+      if (last === undefined) {
+        value = 0
       } else {
-        content.push(content.length - index - 1)
+        value = index - last
       }
+      index++
     }
-    this.log(`${content[content.length - 1]}`)
+    this.log(`${value}`)
   }
 }
