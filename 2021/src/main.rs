@@ -23,16 +23,13 @@ fn day_one(args: &[String]) {
     }
     let mut count = 0;
     if let Ok(lines) = read_lines(&args[0]) {
-        let mut previous = 10000;
-        for line in lines {
-            if let Ok(value) = line {
-                let current = value.parse().unwrap();
-                if current > previous {
-                    count += 1
-                }
-                previous = current
+        let values: Vec<i32> = lines.map(|line| line.unwrap().parse().unwrap()).collect();
+        for n in 3..values.len() {
+            if values[n] > values[n-3] {
+                count += 1
             }
         }
+
     }
 
     println!("Result: {:?}", count)
