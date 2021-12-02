@@ -1,43 +1,50 @@
-use std::{env, io};
-use std::fs::File;
-use std::path::Path;
-use std::io::BufRead;
+use std::env;
+
+mod day_one;
+mod day_two;
+mod file_reader;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
+    let result = run(&args);
+    println!("{:?}", result)
+}
+
+fn run(args: &Vec<String>) -> String {
     match args.len() {
-        1 => println!("I need to know what day it is..."),
+        1 => String::from("I need to know what day it is..."),
         _ => {
             match args[1].parse() {
-                Ok(1) => day_one(&args[2..]),
-                _ => println!("I haven't got that far yet")
+                Ok(1) => day_one::run(&args[2..]),
+                Ok(2) => day_two::run(&args[2..]),
+                _ => String::from("I haven't got that far yet")
             }
         }
     }
 }
 
-fn day_one(args: &[String]) {
-    if args.len() < 1 {
-        println!("I need an input file");
-        return;
-    }
-    let mut count = 0;
-    if let Ok(lines) = read_lines(&args[0]) {
-        let values: Vec<i32> = lines.map(|line| line.unwrap().parse().unwrap()).collect();
-        for n in 3..values.len() {
-            if values[n] > values[n-3] {
-                count += 1
-            }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_run() {
+        for n in 1..3 {
+            let args = vec![String::from("aoc"), format!("{}", n)];
+            assert_eq!("I need an input file", run(&args))
         }
-
     }
 
-    println!("Result: {:?}", count)
+    #[test]
+    fn missing_args() {
+        let args = vec![String::from("aoc")];
+        assert_eq!("I need to know what day it is...", run(&args))
+    }
+
+    #[test]
+    fn test_main() {
+        main()
+    }
 }
 
-fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
-    where P: AsRef<Path>, {
-    let file = File::open(filename)?;
-    Ok(io::BufReader::new(file).lines())
-}
 
